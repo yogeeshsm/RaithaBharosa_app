@@ -28,8 +28,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         // API keys – provide values via app/.env file (see README for setup)
-        buildConfigField("String", "AGMARKNET_API_KEY", "\"${envProperties.getProperty("AGMARKNET_API_KEY") ?: ""}\"")
-        buildConfigField("String", "WEATHER_API_KEY", "\"${envProperties.getProperty("WEATHER_API_KEY") ?: ""}\"")
+        buildConfigField("String", "AGMARKNET_API_KEY", "\"${envProperties.getProperty("Current Daily Price of Various Commodities from Various Markets (Mandi)") ?: ""}\"")
+        buildConfigField("String", "WEATHER_API_KEY", "\"${envProperties.getProperty("WEATHER_API") ?: ""}\"")
+
         
         // Twilio SMS API credentials
         buildConfigField("String", "TWILIO_ACCOUNT_SID", "\"${envProperties.getProperty("TWILIO_ACCOUNT_SID") ?: ""}\"")
