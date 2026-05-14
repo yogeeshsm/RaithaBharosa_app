@@ -1,0 +1,22 @@
+{
+  "name": "raitha-bharosa-data-seeding",
+  "version": "1.0.0",
+  "description": "Firebase data seeding scripts for RaithaBharosa Agricultural Labour Booking System",
+  "main": "seed_labour_data.js",
+  "scripts": {
+    "seed": "node seed_labour_data.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "firebase",
+    "firestore",
+    "seeding",
+    "agriculture",
+    "labour"
+  ],
+  "author": "RaithaBharosa Team",
+  "license": "MIT",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

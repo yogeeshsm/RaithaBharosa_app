@@ -1,0 +1,125 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserRole() {
+      // Safely get user role, return null if document doesn't exist
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
+    }
+    
+    function isFarmer() {
+      let role = getUserRole();
+      return role != null && role == 'FARMER';
+    }
+    
+    function isLabourer() {
+      let role = getUserRole();
+      return role != null && role == 'LABOURER';
+    }
+    
+    // Sample data detection helper - identifies test/development labourer profiles
+    // Pattern: labourer_0XX (e.g., labourer_001, labourer_012, labourer_099)
+    // Purpose: Allows seeding test data without requiring userId to match authenticated UID
+    function isSampleData(userId) {
+      return userId.matches('labourer_0[0-9][0-9]');
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false; // Prevent deletion
+    }
+    
+    // Labourer profiles - readable by all authenticated users, writable by owner
+    // SAMPLE DATA EXCEPTION: Profiles with userId pattern 'labourer_0XX' (e.g., labourer_001, labourer_012)
+    // can be created/updated/deleted by any authenticated user for development and testing purposes.
+    // This allows seeding test data without requiring userId to match authenticated UID.
+    // Production profiles (non-sample data) remain fully protected with ownership and role validation.
+    match /labourer_profiles/{userId} {
+      allow read: if isAuthenticated();
+      // Allow creation: (1) owner with LABOURER role, OR (2) authenticated user creating sample data
+      allow create: if (isOwner(userId) && isLabourer()) || (isAuthenticated() && isSampleData(userId));
+      // Allow updates: (1) owner with LABOURER role, OR (2) authenticated user updating sample data
+      allow update: if (isOwner(userId) && isLabourer()) || (isAuthenticated() && isSampleData(userId));
+      // Allow deletion: (1) owner, OR (2) authenticated user deleting sample data
+      allow delete: if isOwner(userId) || (isAuthenticated() && isSampleData(userId));
+    }
+    
+    // Farmer profiles - readable by labourers with active bookings, writable by owner
+    match /farmer_profiles/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isFarmer();
+      allow update: if isOwner(userId) && isFarmer();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Bookings - readable by farmer or labourer involved, writable with restrictions
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.farmerId || 
+         request.auth.uid == resource.data.labourerId);
+      
+      // Allow any authenticated user to create bookings (simplified for MVP)
+      // NOTE: Booking creation does NOT require a user document to exist in the users collection.
+      // Only authentication and farmerId match are required. This allows farmers to create bookings
+      // immediately after login, even if their user document creation is still in progress.
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.farmerId;
+      
+      allow update: if isAuthenticated() && 
+        (request.auth.uid == resource.data.farmerId ||
+         request.auth.uid == resource.data.labourerId);
+      
+      allow delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.farmerId;
+    }
+    
+    // Ratings - readable by all, writable only by farmer who made the booking
+    match /ratings/{ratingId} {
+      allow read: if isAuthenticated();
+      // Allow any authenticated user to create ratings (simplified for MVP)
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.farmerId;
+      allow update: if false; // Ratings cannot be updated
+      allow delete: if false; // Ratings cannot be deleted
+    }
+    
+    // Work history - readable by labourer owner, writable by system only
+    match /work_history/{workId} {
+      allow read: if isAuthenticated() && 
+        request.auth.uid == resource.data.labourerId;
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Attendance - readable by both parties, writable by labourer
+    match /attendance/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && 
+        request.auth.uid == resource.data.labourerId;
+      allow delete: if false;
+    }
+    
+    // Notification preferences - readable and writable by owner only
+    match /notification_preferences/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+  }
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Raitha-Bharosa Hub</string>
+    
+    <!-- Navigation Labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_home_kn">ಮನೆ</string>
+    <string name="nav_inputs">Inputs</string>
+    <string name="nav_inputs_kn">ಮಣ್ಣು</string>
+    <string name="nav_crops">Crops</string>
+    <string name="nav_crops_kn">ಬೆಳೆ</string>
+    <string name="nav_labour">Labour</string>
+    <string name="nav_labour_kn">ಕಾರ್ಮಿಕರು</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_profile_kn">ಪ್ರೊಫೈಲ್</string>
+    
+    <!-- Screen Titles -->
+    <string name="title_role_selection">Select Your Role</string>
+    <string name="title_role_selection_kn">ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ</string>
+    <string name="title_labourer_profile">Labourer Profile</string>
+    <string name="title_labourer_profile_kn">ಕಾರ್ಮಿಕ ಪ್ರೊಫೈಲ್</string>
+    <string name="title_labourer_search">Find Labourers</string>
+    <string name="title_labourer_search_kn">ಕಾರ್ಮಿಕರನ್ನು ಹುಡುಕಿ</string>
+    <string name="title_create_booking">Create Booking</string>
+    <string name="title_create_booking_kn">ಬುಕಿಂಗ್ ರಚಿಸಿ</string>
+</resources>
