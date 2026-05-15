@@ -85,7 +85,7 @@ RaithaBharosaAndroid/
 ├── gradle/
 │   └── libs.versions.toml         # Centralised dependency versions
 ├── scripts/
-│   └── seed_labour_data.js        # Firestore seed script (Node.js)
+│   └── seed_labour_data     
 └── build.gradle.kts
 ```
 
